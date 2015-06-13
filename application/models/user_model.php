@@ -29,6 +29,30 @@ class User_model extends CI_Model {
             return $query->result();
         }
     }
+    
+    function add_user($user)
+    {
+        if ($user)
+        {
+            $this->db->insert('user',$user);
+            $row = $this->db->affected_rows();
+            $id = $this->db->insert_id();
+            $result=array();
+            $result['id'] = $id;
+            
+            if($row == 1){
+              $response = true;
+               $result['response'] = $response;
+              }else{
+                $response = false;
+                $result['response'] = $response;
+              }
+            
+            return $result;
+        }else{
+            return false;
+        }
+    }
 
        /*
     

@@ -64,9 +64,30 @@ class User_api extends REST_Controller
     function user_post()
     {
         //$this->some_model->updateUser( $this->get('id') );
-        $message = array('id' => $this->get('id'), 'name' => $this->post('name'), 'email' => $this->post('email'), 'message' => 'ADDED!');
+        //$message = array('id' => $this->get('id'), 'name' => $this->post('name'), 'email' => $this->post('email'), 'message' => 'ADDED!');
         
-        $this->response($message, 200); // 200 being the HTTP response code
+        if (isset($_POST))
+        {
+            $user = json_decode(file_get_contents("php://input"));
+/*            $user_data = array(
+                'name'=>$user;
+                'surname'=>$user;
+            );*/
+            $response = $this->User_model->add_user($user);        
+        }
+        
+        if($response['response'])
+        {
+            $message = array('id' => $response['id'], 'message' => 'User ADDED!');
+            $this->response($message, 200); // 200 being the HTTP response code
+        }
+        else
+        {
+            $message = array('id' =>$response['id'], 'message' => 'ERROR!');
+            $this->response($message, 404); // 404 being the HTTP response code(Not Found)
+        }
+        
+        //$this->response($message, 200); // 200 being the HTTP response code
     }
     
     function user_delete()
@@ -96,9 +117,8 @@ class User_api extends REST_Controller
             $this->response(array('error' => 'Couldn\'t find any users!'), 404);
         }
     }
-
-
-	public function send_post()
+    
+    public function send_post()
 	{
 		var_dump($this->request->body);
 	}
