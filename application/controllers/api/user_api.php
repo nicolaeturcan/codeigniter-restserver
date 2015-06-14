@@ -11,6 +11,7 @@
  * @category	Controller
  * @author		Phil Sturgeon
  * @link		http://philsturgeon.co.uk/code/
+ * @editedby    Turcan Nicolae
 */
 
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
@@ -34,6 +35,7 @@ class User_api extends REST_Controller
         $this->methods['user_delete']['limit'] = 50; //50 requests per hour per user/key
     }
     
+    // Get one user by id.
     function user_get()
     {
         if(!$this->get('id'))
@@ -42,13 +44,6 @@ class User_api extends REST_Controller
         }
 
         $user = $this->User_model->get_user( $this->get('id') );
-    	/*$users = array(
-			1 => array('id' => 1, 'name' => 'Some Guy', 'email' => 'example1@example.com', 'fact' => 'Loves swimming'),
-			2 => array('id' => 2, 'name' => 'Person Face', 'email' => 'example2@example.com', 'fact' => 'Has a huge face'),
-			3 => array('id' => 3, 'name' => 'Scotty', 'email' => 'example3@example.com', 'fact' => 'Is a Scott!', array('hobbies' => array('fartings', 'bikes'))),
-		);*/
-		
-    	//$user = @$users[$this->get('id')];
     	
         if($user)
         {
@@ -61,51 +56,58 @@ class User_api extends REST_Controller
         }
     }
     
-    function user_post()
-    {
-        //$this->some_model->updateUser( $this->get('id') );
-        //$message = array('id' => $this->get('id'), 'name' => $this->post('name'), 'email' => $this->post('email'), 'message' => 'ADDED!');
-        
-        if (isset($_POST))
-        {
-            $user = json_decode(file_get_contents("php://input"));
-/*            $user_data = array(
-                'name'=>$user;
-                'surname'=>$user;
-            );*/
-            $response = $this->User_model->add_user($user);        
+    // Create a new user.
+    function new_user_post()
+    {        
+        if($this->post("name") || $this->post("surname")){
+            
+            $result = $this->User_model->add_user($this->post("name"),$this->post("surname"));
+            
+            if($result === FALSE)
+            {
+                $this->response(array('status' => 'failed'));
+            }
+
+            else
+            {
+                $this->response(array('status' => 'success'));
+            }
         }
-        
-        if($response['response'])
-        {
-            $message = array('id' => $response['id'], 'message' => 'User ADDED!');
-            $this->response($message, 200); // 200 being the HTTP response code
-        }
-        else
-        {
-            $message = array('id' =>$response['id'], 'message' => 'ERROR!');
-            $this->response($message, 404); // 404 being the HTTP response code(Not Found)
-        }
-        
-        //$this->response($message, 200); // 200 being the HTTP response code
     }
     
+    // Update an user by id.
+    public function user_put()
+    {
+        $id = $this->put('id');
+        $data = array(
+            'name'=>$this->put('name'),
+            'surname'=>$this->put('surname')
+        );
+            
+        $result = $this->User_model->update_user($id,$data);
+         
+        if($result === false){
+            $this->response(array("status" => "failed"));
+        }else{
+            $this->response(array("status" => "success"));
+        }
+    } 
+    
+    // Delete an user by id.
     function user_delete()
     {
-    	//$this->some_model->deletesomething( $this->get('id') );
-        $message = array('id' => $this->get('id'), 'message' => 'DELETED!');
+    	$result = $this->User_model->delete_user( $this->get('id') );
         
-        $this->response($message, 200); // 200 being the HTTP response code
-    }
+        if($result === false){
+            $this->response(array("status" => "failed"));
+        }else{
+            $this->response(array("status" => "success"));
+        }    }
     
+    // Gets all users from the table
     function users_get()
     {
         $users = $this->User_model->get_all();
-        /* $users = array(
-			array('id' => 1, 'name' => 'Some Guy', 'email' => 'example1@example.com'),
-			array('id' => 2, 'name' => 'Person Face', 'email' => 'example2@example.com'),
-			3 => array('id' => 3, 'name' => 'Scotty', 'email' => 'example3@example.com', 'fact' => array('hobbies' => array('fartings', 'bikes'))),
-		);*/
         
         if($users)
         {
@@ -118,6 +120,7 @@ class User_api extends REST_Controller
         }
     }
     
+        
     public function send_post()
 	{
 		var_dump($this->request->body);

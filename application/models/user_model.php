@@ -13,7 +13,6 @@ class User_model extends CI_Model {
         $this->db->select('id, name, surname');
         $this->db->where('id',$id);
         $query = $this->db->get('user');
-        //log_message('debug', var_export($query));
 
         if($query->num_rows() == 1){
             return $query->result();
@@ -30,59 +29,27 @@ class User_model extends CI_Model {
         }
     }
     
-    function add_user($user)
+    function add_user($name, $surname) 
     {
-        if ($user)
-        {
-            $this->db->insert('user',$user);
-            $row = $this->db->affected_rows();
-            $id = $this->db->insert_id();
-            $result=array();
-            $result['id'] = $id;
-            
-            if($row == 1){
-              $response = true;
-               $result['response'] = $response;
-              }else{
-                $response = false;
-                $result['response'] = $response;
-              }
-            
-            return $result;
-        }else{
-            return false;
-        }
-    }
-
-       /*
-    
-        public function get($id)
-    {
-        this->db->select('id, name', 'surname');
-        $query = $this->db->get_where("user", array("id" => $id));
-        if($query->num_rows() == 1){
-            return $query->row();
-        }
-    }
-    
-    
-    public function get_all()
-    {
-        $this->db->select('id','name','surname');
-        $this->db->from('user');
-
-        $query = $this->db->get();
+        $data = array(
+            "name" => $name,
+            "surname" => $surname
+        );
         
-        echo $this->db->last_query(). "<br/>";
-        log_message('debug', var_export($query));
-        
-        if($query->num_rows() > 0){
-            return $query->result();
-        }
+        return $this->db->insert("user", $data);
     }
-*/
-   
     
+    function update_user($id, $data){
+
+        $this->db->where('id',$id);
+        return $this->db->update('user',$data);
+    }
+    
+    public function delete_user($id)
+    {
+        $this->db->where('id',$id);
+        return $this->db->delete('user');
+    } 
 }
 
 ?>
