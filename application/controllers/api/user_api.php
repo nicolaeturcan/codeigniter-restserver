@@ -102,7 +102,8 @@ class User_api extends REST_Controller
             $this->response(array("status" => "failed"));
         }else{
             $this->response(array("status" => "success"));
-        }    }
+        }    
+    }
     
     // Gets all users from the table
     function users_get()
